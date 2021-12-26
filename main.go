@@ -14,6 +14,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}*/
-	f := strings.NewReader("//testing\n\"parent\"(Alexei, Olga).")
+	f := strings.NewReader("//testing\n\"parent\"(Alexei, Olga).\nparent(Alexei, Andrey)?")
 	parse(f)
 }

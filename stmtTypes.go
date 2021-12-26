@@ -1,20 +1,28 @@
 package main
 
+import "fmt"
+
 type stmt interface {
 	stmtShow()
 }
 
 type pred struct {
-	body block
+	body []block
 }
 type quer struct {
-	body block
+	body []block
 }
 
 func (q quer) stmtShow() {
-	q.body.blockShow()
+	for _, b := range q.body {
+		b.blockShow()
+	}
+	fmt.Println()
 }
 
 func (p pred) stmtShow() {
-	p.body.blockShow()
+	for _, b := range p.body {
+		b.blockShow()
+	}
+	fmt.Println()
 }

@@ -37,8 +37,8 @@ type eq struct {
 }
 
 type compound struct {
-	head string
-	body block
+	head block
+	body []block
 }
 
 func (a atom) blockShow() {
@@ -78,7 +78,11 @@ func (q eq) blockShow() {
 }
 
 func (c compound) blockShow() {
-	fmt.Printf("%v(", c.head)
-	c.body.blockShow()
-	fmt.Print(")")
+	c.head.blockShow()
+	for i, b := range c.body {
+		b.blockShow()
+		if fmt.Sprintf("%T", c.body[i+1]) != "main.cParenth" {
+			fmt.Print(", ")
+		}
+	}
 }
