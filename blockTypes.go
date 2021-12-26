@@ -14,6 +14,22 @@ type variable struct {
 	str string
 }
 
+type str struct {
+	str string
+}
+
+type oParenth struct {
+}
+
+type cParenth struct {
+}
+
+type quest struct {
+}
+
+type period struct {
+}
+
 type compound struct {
 	head string
 	body block
@@ -25,6 +41,26 @@ func (a atom) blockShow() {
 
 func (v variable) blockShow() {
 	fmt.Print(v.str)
+}
+
+func (s str) blockShow() {
+	fmt.Print(s.str)
+}
+
+func (o oParenth) blockShow() {
+	fmt.Printf("%c", '(')
+}
+
+func (c cParenth) blockShow() {
+	fmt.Printf("%c", ')')
+}
+
+func (q quest) blockShow() {
+	fmt.Printf("%c", '?')
+}
+
+func (p period) blockShow() {
+	fmt.Printf("%c", '.')
 }
 
 func (c compound) blockShow() {
