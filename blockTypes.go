@@ -30,6 +30,12 @@ type quest struct {
 type period struct {
 }
 
+type col struct {
+}
+
+type eq struct {
+}
+
 type compound struct {
 	head string
 	body block
@@ -61,6 +67,14 @@ func (q quest) blockShow() {
 
 func (p period) blockShow() {
 	fmt.Printf("%c", '.')
+}
+
+func (c col) blockShow() {
+	fmt.Printf("%c", ':')
+}
+
+func (q eq) blockShow() {
+	fmt.Printf("%c", '=')
 }
 
 func (c compound) blockShow() {
