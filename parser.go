@@ -29,7 +29,7 @@ func parse(f *strings.Reader) {
 			ctmp.body = make([]block, 100)
 			ctmp.head = p
 			//fmt.Printf("is it a pointer???? well it is a: %T\n", p)
-			copy(ctmp.body, tokens[cStart[len(cStart)-1]+1:len(tokens)])
+			copy(ctmp.body, tokens[cStart[len(cStart)-1]+1:])
 			//copy_1 := copy(ctmp.body, tokens)
 			//fmt.Println(copy_1)
 			//fmt.Println(tokens)
