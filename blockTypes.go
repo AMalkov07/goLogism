@@ -80,8 +80,15 @@ func (q eq) blockShow() {
 func (c compound) blockShow() {
 	c.head.blockShow()
 	for i, b := range c.body {
+		if b == nil {
+			break
+		}
 		b.blockShow()
-		if fmt.Sprintf("%T", c.body[i+1]) != "main.cParenth" {
+		//fmt.Printf("testing testing::: %T\n", c.body[i])
+		//if fmt.Sprintf("%T", c.body[i]) == "*main.oParenth" {
+		//	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+		//}
+		if fmt.Sprintf("%T", c.body[i]) != "*main.oParenth" && fmt.Sprintf("%T", c.body[i+1]) != "*main.cParenth" && fmt.Sprintf("%T", c.body[i]) != "*main.cParenth" && fmt.Sprintf("%T", c.body[i-1]) != "*main.cParenth" {
 			fmt.Print(", ")
 		}
 	}
