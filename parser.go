@@ -7,7 +7,13 @@ import (
 	"unicode"
 )
 
-func parse(f *strings.Reader) {
+func compoundBodyCopy(c *compound, bs []block) {
+	for _, b := range bs {
+		c.body = append(c.body, b)
+	}
+}
+
+func parse(f *strings.Reader) []stmt {
 	var tokens []block
 	var stmts []stmt
 	var cStart []int
@@ -26,13 +32,10 @@ func parse(f *strings.Reader) {
 			p := tokens[cStart[len(cStart)-1]]
 			//fmt.Printf("is it a pointer???? well it is a: %T\n", p)
 			ctmp := new(compound)
-			ctmp.body = make([]block, 100)
+			ctmp.body = make([]block, 0)
 			ctmp.head = p
-			//fmt.Printf("is it a pointer???? well it is a: %T\n", p)
-			copy(ctmp.body, tokens[cStart[len(cStart)-1]+1:])
-			//copy_1 := copy(ctmp.body, tokens)
-			//fmt.Println(copy_1)
-			//fmt.Println(tokens)
+			//copy(ctmp.body, tokens[cStart[len(cStart)-1]+1:])
+			compoundBodyCopy(ctmp, tokens[cStart[len(cStart)-1]+1:])
 			tokens[cStart[len(cStart)-1]] = ctmp
 			tokens = tokens[:cStart[len(cStart)-1]+1]
 			cStart = cStart[:len(cStart)-1]
@@ -56,7 +59,7 @@ func parse(f *strings.Reader) {
 			}
 		}
 	}
-	for _, val := range tokens {
+	/*for _, val := range tokens {
 		fmt.Printf("%T: ", val)
 		val.blockShow()
 		fmt.Println()
@@ -64,5 +67,6 @@ func parse(f *strings.Reader) {
 	for _, val := range stmts {
 		fmt.Printf("%T: ", val)
 		val.stmtShow()
-	}
+	}*/
+	return stmts
 }

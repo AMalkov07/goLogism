@@ -26,5 +26,5 @@ func main() {
 	//fmt.Println((ff))
 	//f := os.Args[1]
 	//f := strings.NewReader("//testing\n\"parent\"(Alexei, Olga).\nparent(Alexei, Andrey)?")
-	parse(strings.NewReader(string(ff)))
+	evaluate(parse(strings.NewReader(string(ff))))
 }

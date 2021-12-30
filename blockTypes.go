@@ -1,9 +1,13 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
 type block interface {
 	blockShow()
+	getVal() string
 }
 
 type atom struct {
@@ -39,6 +43,48 @@ type eq struct {
 type compound struct {
 	head block
 	body []block
+}
+
+func (a atom) getVal() string {
+	return a.str
+}
+
+func (v variable) getVal() string {
+	return v.str
+}
+
+func (s str) getVal() string {
+	return s.str
+}
+
+func (o oParenth) getVal() string {
+	return "("
+}
+
+func (c cParenth) getVal() string {
+	return ")"
+}
+
+func (q quest) getVal() string {
+	return "?"
+}
+
+func (p period) getVal() string {
+	return "."
+}
+
+func (c col) getVal() string {
+	return ":"
+}
+
+func (q eq) getVal() string {
+	return "="
+}
+
+func (c compound) getVal() string {
+	fmt.Println("whoops, getVal was called on compound type, something went wrong")
+	os.Exit(3)
+	return ""
 }
 
 func (a atom) blockShow() {
