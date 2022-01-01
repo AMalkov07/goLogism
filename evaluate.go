@@ -4,10 +4,13 @@ import (
 	"fmt"
 )
 
+type tracker struct {
+	preds []stmt
+}
+
 func blockCmp(b1 []block, b2 []block) bool {
 	var type1 string
 	var type2 string
-	//fmt.Printf("size of first block is: %v\n", len(b1))
 	for i, j := 0, 0; i < len(b1) && j < len(b2); {
 		type1 = fmt.Sprintf("%T", b1[i])
 		type2 = fmt.Sprintf("%T", b2[j])
@@ -38,8 +41,8 @@ func blockCmp(b1 []block, b2 []block) bool {
 	return true
 }
 
-func evalQuer(s stmt, ss []stmt) {
-	for _, elem := range ss {
+func evalQuer(s stmt, t *tracker) {
+	for _, elem := range t.preds {
 		if blockCmp(s.(quer).body, elem.(pred).body) {
 			fmt.Println("True")
 			return
@@ -49,12 +52,13 @@ func evalQuer(s stmt, ss []stmt) {
 }
 
 func evaluate(s []stmt) {
-	var preds []stmt
+	var t *tracker
+	t = new(tracker)
 	for _, s := range s {
 		if fmt.Sprintf("%T", s) == "main.pred" {
-			preds = append(preds, s)
+			t.preds = append(t.preds, s)
 		} else if fmt.Sprintf("%T", s) == "main.quer" {
-			evalQuer(s, preds)
+			evalQuer(s, t)
 		}
 	}
 	/*for _, elem := range preds {

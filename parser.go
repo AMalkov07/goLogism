@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"strings"
 	"text/scanner"
 	"unicode"
@@ -20,26 +19,21 @@ func parse(f *strings.Reader) []stmt {
 	var s scanner.Scanner
 	s.Init(f)
 	for tok := s.Scan(); tok != scanner.EOF; tok = s.Scan() {
-		fmt.Printf("%s: %s\n", s.Position, s.TokenText())
 		tmp := s.TokenText()
 		switch tmp {
 		case "(":
 			tokens = append(tokens, (new(oParenth)))
 			cStart = append(cStart, len(tokens)-2)
 		case ")":
-			fmt.Println(tokens)
 			tokens = append(tokens, (new(cParenth)))
 			p := tokens[cStart[len(cStart)-1]]
-			//fmt.Printf("is it a pointer???? well it is a: %T\n", p)
 			ctmp := new(compound)
 			ctmp.body = make([]block, 0)
 			ctmp.head = p
-			//copy(ctmp.body, tokens[cStart[len(cStart)-1]+1:])
 			compoundBodyCopy(ctmp, tokens[cStart[len(cStart)-1]+1:])
 			tokens[cStart[len(cStart)-1]] = ctmp
 			tokens = tokens[:cStart[len(cStart)-1]+1]
 			cStart = cStart[:len(cStart)-1]
-			//tokens[len(cStart)-1] = compound{head: tokens[len(cStart)-1], body: make([]block, 0)}
 
 		case "?":
 			tokens = append(tokens, quest{})
@@ -59,14 +53,5 @@ func parse(f *strings.Reader) []stmt {
 			}
 		}
 	}
-	/*for _, val := range tokens {
-		fmt.Printf("%T: ", val)
-		val.blockShow()
-		fmt.Println()
-	}
-	for _, val := range stmts {
-		fmt.Printf("%T: ", val)
-		val.stmtShow()
-	}*/
 	return stmts
 }
