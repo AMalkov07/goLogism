@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 )
@@ -14,18 +15,20 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	f = f[2:]
+	for i := 0; i < len(f); {
+		if f[i] == 0 {
+			f = append(f[:i], f[i+1:]...)
+		} else {
+			i++
+		}
+	}
+
 	fStr := string(f)
+	fmt.Printf("%v\n", []byte(fStr))
 	BeginLexing(fStr)
 
-	/*
-		f = f[2:]
-		for i := 0; i < len(ff); {
-			if f[i] == 0 {
-				ff = append(f[:i], f[i+1:]...)
-			} else {
-				i++
-			}
-		}*/
 	//fmt.Println((ff))
 	//f := os.Args[1]
 	//f := strings.NewReader("//testing\n\"parent\"(Alexei, Olga).\nparent(Alexei, Andrey)?")

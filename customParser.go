@@ -11,6 +11,7 @@ const (
 	oParen tokenType = iota // iota is a magic word that makes our values equal to number. (first value in struct is 0, next is 1, etc)
 	cParen
 	punct
+	comma
 	atom
 	variable
 	str
@@ -36,7 +37,7 @@ func parse(tokens chan token) {
 		if !ok {
 			panic("no more tokens")
 		}
-		fmt.Println(token.value, ",")
+		fmt.Print(token.value, ",")
 	}
 }
 
@@ -69,15 +70,18 @@ func determineToken(l *lexer) stateFunc {
 			l.emit(oParen)
 		case r == ')':
 			l.emit(cParen)
+		case r == ',':
+			l.emit(comma)
 		case isUpper(r): // means that we are at the start of a var
 			return lexVar
 		case isLower(r): // means that we are at the start of a Atom
 			return lexAtom
 		case r == '"': // means that we are at the start of a str
 			return lexStr
-		case r == eof:
 		case isPunct(r):
 			return lexPunct
+		case r == eof:
+			return nil
 		default:
 			panic("unknown input was discovered")
 			//fmt.Println("unknown input was discovered")
@@ -119,7 +123,7 @@ func lexStr(l *lexer) stateFunc {
 }
 
 func (l *lexer) accept(valid string) bool {
-	if strings.IndexRune(valid, l.next()) >= 0 {
+	if strings.ContainsRune(valid, l.next()) {
 		return true
 	}
 	l.backup()
@@ -127,7 +131,7 @@ func (l *lexer) accept(valid string) bool {
 }
 
 func (l *lexer) acceptRun(valid string) {
-	for strings.IndexRune(valid, l.next()) >= 0 {
+	for strings.ContainsRune(valid, l.next()) {
 	}
 	l.backup()
 }
