@@ -6,6 +6,47 @@ import (
 	"unicode/utf8"
 )
 
+type stmt interface {
+	showInterface()
+}
+
+type pred struct {
+	c compound
+}
+
+type quer struct {
+	c compound
+}
+
+func (p pred) showInterface() {
+	p.c.show()
+	fmt.Println(".")
+}
+
+func (q quer) showInterface() {
+	q.c.show()
+	fmt.Println("?")
+}
+
+type block interface {
+	show()
+}
+
+type compound struct {
+	//outer token
+	outer block
+	inner []block
+}
+
+func (c *compound) show() {
+	c.outer.show()
+	fmt.Print("(")
+	for i := 0; i < len(c.inner); i++ {
+		c.inner[i].show()
+	}
+	fmt.Print(")")
+}
+
 type tokenType int // our tokens are basically just ghetto enums
 const (
 	oParen tokenType = iota // iota is a magic word that makes our values equal to number. (first value in struct is 0, next is 1, etc)
@@ -15,7 +56,12 @@ const (
 	atom
 	variable
 	str
+	comment
 )
+
+func (t token) show() {
+	fmt.Print(t.value)
+}
 
 type token struct {
 	typ   tokenType
@@ -31,27 +77,67 @@ type lexer struct {
 }
 
 //func parse(tokens chan token) Node {
-func parse(tokens chan token) {
+func parse(tokens chan token) []stmt {
+	output := []stmt{}
+	com := compound{}
+	var tmp *compound
+	pCount := 0
 	for {
 		token, ok := <-tokens
 		if !ok {
-			panic("no more tokens")
+			break
+			//panic("no more tokens")
 		}
-		fmt.Print(token.value, ",")
+		switch token.typ {
+		case oParen:
+			pCount++
+			if pCount > 1 {
+				com.inner[len(com.inner)-1] = &compound{outer: com.inner[len(com.inner)-1]}
+			}
+		case cParen:
+			pCount--
+		//case comma:
+		case atom, variable, str, comma:
+			if pCount == 0 {
+				com.outer = token // not sure if this will create problems
+			} else if pCount == 1 {
+				com.inner = append(com.inner, token)
+			} else {
+				tmp = &com
+				for i := pCount; i > 1; i-- {
+					tmp, ok = tmp.inner[len(tmp.inner)-1].(*compound)
+					if !ok {
+						panic("something went wrong with the compound")
+					}
+					tmp.inner = append(tmp.inner, token)
+				}
+			}
+		case punct:
+			if token.value == "?" {
+				output = append(output, quer{com})
+			} else {
+				output = append(output, pred{com})
+			}
+			com = compound{}
+		case comment:
+			continue
+		default:
+			panic("something went wrong, couldn't identify token")
+		}
 	}
+	return output
 }
 
 const eof rune = -1 // this eof will tell us when we are done w/ the whole file
 
 type stateFunc func(*lexer) stateFunc
 
-//func BeginLexing(s string) Node {
-func BeginLexing(s string) {
+func BeginLexing(s string) []stmt {
 	l := &lexer{
 		input:  s,
 		tokens: make(chan token, 100)} // we want the channel to be buffered so that the lexer can keep adding tokens, even if the parser hasn't pulled them out to parse them yet
 	go l.run() // go routine
-	parse(l.tokens)
+	return parse(l.tokens)
 }
 
 func (l *lexer) run() {
@@ -72,6 +158,8 @@ func determineToken(l *lexer) stateFunc {
 			l.emit(cParen)
 		case r == ',':
 			l.emit(comma)
+		case r == '%':
+			return lexComment
 		case isUpper(r): // means that we are at the start of a var
 			return lexVar
 		case isLower(r): // means that we are at the start of a Atom
@@ -122,6 +210,13 @@ func lexStr(l *lexer) stateFunc {
 	return determineToken
 }
 
+func lexComment(l *lexer) stateFunc {
+	l.accept("%")
+	l.acceptRunNot("\n")
+	l.emit(comment)
+	return determineToken
+}
+
 func (l *lexer) accept(valid string) bool {
 	if strings.ContainsRune(valid, l.next()) {
 		return true
@@ -132,6 +227,12 @@ func (l *lexer) accept(valid string) bool {
 
 func (l *lexer) acceptRun(valid string) {
 	for strings.ContainsRune(valid, l.next()) {
+	}
+	l.backup()
+}
+
+func (l *lexer) acceptRunNot(valid string) {
+	for !strings.ContainsRune(valid, l.next()) {
 	}
 	l.backup()
 }

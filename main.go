@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 )
@@ -26,8 +25,11 @@ func main() {
 	}
 
 	fStr := string(f)
-	fmt.Printf("%v\n", []byte(fStr))
-	BeginLexing(fStr)
+	//fmt.Printf("%v\n", []byte(fStr))
+	x := BeginLexing(fStr)
+	for _, elem := range x {
+		elem.showInterface()
+	}
 
 	//fmt.Println((ff))
 	//f := os.Args[1]
