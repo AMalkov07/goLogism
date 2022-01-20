@@ -35,6 +35,7 @@ const (
 	variable
 	str
 	comment
+	shortcut
 )
 
 func (t token) show() {
@@ -94,6 +95,8 @@ func determineToken(l *lexer) stateFunc {
 			return lexStr
 		case isPunct(r):
 			return lexPunct
+		case isInt(r): // means we have a shortcut
+			return lexInt
 		case r == eof:
 			return nil
 		default:
@@ -107,6 +110,14 @@ func determineToken(l *lexer) stateFunc {
 func lexPunct(l *lexer) stateFunc {
 	l.accept(".?")
 	l.emit(punct)
+	return determineToken
+}
+
+func lexInt(l *lexer) stateFunc {
+	l.accept("123456789")
+	ints := "01234567890"
+	l.accept(ints)
+	l.emit(shortcut)
 	return determineToken
 }
 
@@ -173,6 +184,10 @@ func isUpper(r rune) bool {
 
 func isLower(r rune) bool {
 	return r >= 'a' && r <= 'z'
+}
+
+func isInt(r rune) bool {
+	return r >= '1' && r <= '9'
 }
 
 func isPunct(r rune) bool {
