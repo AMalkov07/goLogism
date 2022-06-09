@@ -36,6 +36,7 @@ const (
 	str
 	comment
 	shortcut
+	list
 )
 
 func (t token) show() {
@@ -93,6 +94,8 @@ func determineToken(l *lexer) stateFunc {
 			return lexAtom
 		case r == '"': // means that we are at the start of a str
 			return lexStr
+		case r == '[':
+			return lexList
 		case isPunct(r):
 			return lexPunct
 		case isInt(r): // means we have a shortcut
@@ -127,6 +130,14 @@ func lexVar(l *lexer) stateFunc {
 	l.accept(upper)
 	l.acceptRun(lower)
 	l.emit(variable)
+	return determineToken
+}
+
+func lexList(l *lexer) stateFunc {
+	l.accept("[")
+	l.acceptRunNot("]")
+	l.accept("]")
+	l.emit(list)
 	return determineToken
 }
 

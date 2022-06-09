@@ -51,8 +51,6 @@ func parse(tokens chan token) []stmt {
 		case atom, variable, str, comma:
 			if pCount == 0 {
 				com.outer = tk
-				/*} else if pCount == 1 {
-				com.inner = append(com.inner, tk)*/
 			} else if pCount == 1 {
 				com.inner = append(com.inner, tk)
 			} else {
@@ -82,6 +80,10 @@ func parse(tokens chan token) []stmt {
 					}
 					tmp.inner = append(tmp.inner, tk.stoc())
 				}
+			}
+		case list:
+			if pCount == 0 {
+				panic("misplaced list")
 			}
 		case punct:
 			if tk.value == "?" {
